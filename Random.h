@@ -84,13 +84,39 @@ public:
     }
   }
 
+  /// Next pseudo-random number.
+  /** next() is based upon xoroshiro128+ at http://xoshiro.di.unimi.it */
+  uint64_t next()
+  {
+    // If state is {0, 0} then use seed to initialize.
+    if (state[0] == 0 && state[1] == 0) {
+      // TODO: Use splitmix64 with input of seed_ instead to expand seed to 128 bits.
+      state[0] = seed_;
+      state[1] = seed_ * nextPrime();
+    }
+
+    const auto s0 = state[0];
+    auto s1 = state[1];
+    const auto res = s0 + s1;
+    s1 ^= s0;
+    state[0] = rotl(s0, 24) ^ s1 ^ (s1 << 16);
+    state[1] = rotl(s1, 37);
+    return res;
+  }
+
 private:
   uint64_t nextPrime()
   {
     return primes[primeIndex++ % primes.size()];
   }
 
+  inline uint64_t rotl(const uint64_t x, int k)
+  {
+    return (x << k) | (x >> (64 - k));
+  }
+
   uint64_t seed_ = 1;
+  uint64_t state[2] = {0, 0};
   int primeIndex = 0;
   const std::vector<uint64_t> primes = {
     7211, 7213, 7219, 7229, 7237, 7243, 7247, 7253, 7283, 7297, 7307, 7309, 7321, 7331, 7333,
