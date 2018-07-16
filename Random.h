@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstddef>
 #include <initializer_list>
+#include <utility>
 #include <vector>
 
 #include <eosiolib/transaction.h>
@@ -101,6 +102,16 @@ public:
     state[0] = rotl(s0, 24) ^ s1 ^ (s1 << 16);
     state[1] = rotl(s1, 37);
     return res;
+  }
+
+  /// Shuffles every element of container \p data around once.
+  template <typename Container>
+  void shuffle(Container &data)
+  {
+    const auto size = data.size();
+    for (auto it = data.begin(); it != data.end(); ++it) {
+      std::swap(*it, *(data.begin() + (next() % size)));
+    }
   }
 
 private:
