@@ -88,11 +88,10 @@ public:
   /** next() is based upon xoroshiro128+ at http://xoshiro.di.unimi.it */
   uint64_t next()
   {
-    // If state is {0, 0} then use seed to initialize.
+    // If state is {0, 0} then use splitmix64 to expand 64-bit seed into the 128-bit state.
     if (state[0] == 0 && state[1] == 0) {
-      // TODO: Use splitmix64 with input of seed_ instead to expand seed to 128 bits.
-      state[0] = seed_;
-      state[1] = seed_ * nextPrime();
+      state[0] = splitmix64(seed_);
+      state[1] = splitmix64(state[0]);
     }
 
     const auto s0 = state[0];
@@ -113,6 +112,15 @@ private:
   inline uint64_t rotl(const uint64_t x, int k)
   {
     return (x << k) | (x >> (64 - k));
+  }
+
+  /// Based on https://dl.acm.org/citation.cfm?doid=2714064.2660195
+  inline uint64_t splitmix64(const uint64_t input)
+  {
+    auto z = (input + uint64_t(0x9E3779B97F4A7C15));
+    z = (z ^ (z >> 30)) * uint64_t(0xBF58476D1CE4E5B9);
+    z = (z ^ (z >> 27)) * uint64_t(0x94D049BB133111EB);
+    return z ^ (z >> 31);
   }
 
   uint64_t seed_ = 1;
