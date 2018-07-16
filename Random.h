@@ -32,10 +32,10 @@ public:
     return seed_;
   }
 
-  /// Accumulate seed with \p extra multiplied with the next internal prime.
+  /// Accumulate seed with \p extra.
   void accumSeed(const uint64_t extra)
   {
-    seed_ *= extra * nextPrime();
+    seed_ = splitmix64(seed_ ^ extra * nextPrime());
   }
 
   void accumSeed(const checksum160 &extra)
