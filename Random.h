@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include <eosiolib/eosio.hpp>
 #include <eosiolib/transaction.h>
 #include <eosiolib/types.h>
 
@@ -112,6 +113,12 @@ public:
     return static_cast<double>(next()) / max;
   }
 
+  /// Next number in [min, max[
+  uint64_t nextInRange(const uint64_t min, const uint64_t max)
+  {
+    eosio_assert(min < max, "Failed: min < max");
+    return static_cast<uint64_t>(static_cast<double>(max - min) * nextDouble()) + min;
+  }
 
   /// Shuffles every element of container \p data around once.
   template <typename Container>
