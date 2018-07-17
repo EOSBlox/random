@@ -33,6 +33,13 @@ static inline void assertNextInRangeEq(Random &gen, const uint64_t min, const ui
   assert(gen.nextInRange(min, max) == value);
 }
 
+template <typename Container>
+static inline void assertShuffleEq(Random &gen, Container &data, const Container &value)
+{
+  gen.shuffle(data);
+  assert(data == value);
+}
+
 void testSeedAccumulation()
 {
   Random gen(1);
@@ -112,11 +119,35 @@ void testNextInRange()
   assertNextInRangeEq(gen, 10, 20, 18);
 }
 
+void testShuffle()
+{
+  {
+    Random gen(42);
+    std::string str("Hello, World!");
+    assertShuffleEq(gen, str, std::string("llo,lrH!do eW"));
+    assertShuffleEq(gen, str, std::string("Hlr ,ldoWel!o"));
+    assertShuffleEq(gen, str, std::string("l,Woordl Hle!"));
+    assertShuffleEq(gen, str, std::string("dllooe,lHr !W"));
+    assertShuffleEq(gen, str, std::string("oeH!d,rllWo l"));
+  }
+  {
+    Random gen(42);
+    using IVec = std::vector<int>;
+    IVec vec{1, 2, 3, 4, 5};
+    assertShuffleEq(gen, vec, IVec{1, 2, 5, 4, 3});
+    assertShuffleEq(gen, vec, IVec{4, 5, 1, 2, 3});
+    assertShuffleEq(gen, vec, IVec{1, 4, 2, 3, 5});
+    assertShuffleEq(gen, vec, IVec{1, 3, 5, 4, 2});
+    assertShuffleEq(gen, vec, IVec{3, 5, 4, 1, 2});
+  }
+}
+
 int main(int argc, char **argv)
 {
   testSeedAccumulation();
   testNext();
   testNextDouble();
   testNextInRange();
+  testShuffle();
   return 0;
 }
