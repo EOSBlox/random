@@ -2,6 +2,7 @@
 using namespace eosblox;
 
 #include <cassert>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -13,6 +14,17 @@ static inline void assertSeedEq(const Random &gen, const uint64_t seed)
 static inline void assertNextEq(Random &gen, const uint64_t value)
 {
   assert(gen.next() == value);
+}
+
+static inline bool doubleEqual(const double a, const double b)
+{
+  constexpr double epsilon = 0.0000001;
+  return std::abs(a - b) <= ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
+}
+
+static inline void assertNextDoubleEq(Random &gen, const double value)
+{
+  assert(doubleEqual(gen.nextDouble(), value));
 }
 
 void testSeedAccumulation()
@@ -74,9 +86,20 @@ void testNext()
   }
 }
 
+void testNextDouble()
+{
+  Random gen(42);
+  assertNextDoubleEq(gen, 8.485680e-02);
+  assertNextDoubleEq(gen, 3.902738e-01);
+  assertNextDoubleEq(gen, 2.926740e-01);
+  assertNextDoubleEq(gen, 7.088247e-01);
+  assertNextDoubleEq(gen, 8.789325e-01);
+}
+
 int main(int argc, char **argv)
 {
   testSeedAccumulation();
   testNext();
+  testNextDouble();
   return 0;
 }
