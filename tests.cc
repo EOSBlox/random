@@ -27,6 +27,12 @@ static inline void assertNextDoubleEq(Random &gen, const double value)
   assert(doubleEqual(gen.nextDouble(), value));
 }
 
+static inline void assertNextInRangeEq(Random &gen, const uint64_t min, const uint64_t max,
+                                       const uint64_t value)
+{
+  assert(gen.nextInRange(min, max) == value);
+}
+
 void testSeedAccumulation()
 {
   Random gen(1);
@@ -96,10 +102,21 @@ void testNextDouble()
   assertNextDoubleEq(gen, 8.789325e-01);
 }
 
+void testNextInRange()
+{
+  Random gen(42);
+  assertNextInRangeEq(gen, 10, 20, 10);
+  assertNextInRangeEq(gen, 10, 20, 13);
+  assertNextInRangeEq(gen, 10, 20, 12);
+  assertNextInRangeEq(gen, 10, 20, 17);
+  assertNextInRangeEq(gen, 10, 20, 18);
+}
+
 int main(int argc, char **argv)
 {
   testSeedAccumulation();
   testNext();
   testNextDouble();
+  testNextInRange();
   return 0;
 }
