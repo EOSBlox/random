@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstddef>
 #include <initializer_list>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -103,6 +104,14 @@ public:
     state[1] = rotl(s1, 37);
     return res;
   }
+
+  /// Next double in [0, 1[
+  double nextDouble()
+  {
+    constexpr auto max = static_cast<double>(std::numeric_limits<uint64_t>::max());
+    return static_cast<double>(next()) / max;
+  }
+
 
   /// Shuffles every element of container \p data around once.
   template <typename Container>
