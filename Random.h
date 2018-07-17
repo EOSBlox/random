@@ -2,6 +2,7 @@
 #ifndef EOS_BLOX_RANDOM_H
 #define EOS_BLOX_RANDOM_H
 
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <initializer_list>
@@ -9,21 +10,25 @@
 #include <utility>
 #include <vector>
 
+#ifndef NO_EOSIO
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/transaction.h>
 #include <eosiolib/types.h>
+#endif
 
 namespace eosblox {
 
 /// Pseudo-random number generator.
 class Random {
 public:
+#ifndef NO_EOSIO
   /// Initialize generator with a seed derived from the Transactions as Proof-of-Stake (TAPOS)
   /// block number and prefix.
   Random()
   {
     accumSeedRange({std::abs(tapos_block_num()), std::abs(tapos_block_prefix())});
   }
+#endif
 
   Random(const uint64_t seed) : seed_(seed)
   {
@@ -40,6 +45,7 @@ public:
     seed_ = splitmix64(seed_ ^ extra * nextPrime());
   }
 
+#ifndef NO_EOSIO
   void accumSeed(const checksum160 &extra)
   {
     accumSeedArray(extra.hash);
@@ -64,6 +70,7 @@ public:
   {
     accumSeedArray(extra.data);
   }
+#endif
 
   template <typename T>
   void accumSeedRange(std::initializer_list<T> &&extra)
@@ -116,7 +123,11 @@ public:
   /// Next number in [min, max[
   uint64_t nextInRange(const uint64_t min, const uint64_t max)
   {
+#ifndef NO_EOSIO
     eosio_assert(min < max, "Failed: min < max");
+#else
+    assert(min < max);
+#endif
     return static_cast<uint64_t>(static_cast<double>(max - min) * nextDouble()) + min;
   }
 
