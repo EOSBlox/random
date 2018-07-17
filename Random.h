@@ -19,6 +19,22 @@
 namespace eosblox {
 
 /// Pseudo-random number generator.
+/** The 64-bit internal seed is expanded using splitmix64 [0] into a 128-bit state, which the
+    xoroshiro128+ [1] generator is continually applied to for retrieving the next pseudo-random
+    number in the sequence.
+
+    If further values are given to accumulate the seed, splitmix64 is applied together with the next
+    prime in an internal sequence.
+
+    Operations for generating randomness:
+    * \p next()
+    * \p nextDouble()
+    * \p nextInRange()
+    * \p shuffle()
+
+    [0]: https://dl.acm.org/citation.cfm?doid=2714064.2660195
+    [1]: http://xoshiro.di.unimi.it
+    */
 class Random {
 public:
 #ifndef NO_EOSIO
@@ -152,7 +168,6 @@ private:
     return (x << k) | (x >> (64 - k));
   }
 
-  /// Based on https://dl.acm.org/citation.cfm?doid=2714064.2660195
   inline uint64_t splitmix64(const uint64_t input)
   {
     auto z = (input + uint64_t(0x9E3779B97F4A7C15));
