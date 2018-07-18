@@ -15,6 +15,10 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/transaction.h>
 #include <eosiolib/types.h>
+
+#define EOSIO_ASSERT(expr) eosio_assert(expr, "Failed: " # expr);
+#else
+#define EOSIO_ASSERT(expr) assert(expr);
 #endif
 
 namespace eosblox {
@@ -143,11 +147,7 @@ public:
   /// Next number in [min, max[
   uint64_t nextInRange(const uint64_t min, const uint64_t max)
   {
-#ifndef NO_EOSIO
-    eosio_assert(min < max, "Failed: min < max");
-#else
-    assert(min < max);
-#endif
+    EOSIO_ASSERT(min < max);
     return static_cast<uint64_t>(static_cast<double>(max - min) * nextDouble()) + min;
   }
 
@@ -165,11 +165,7 @@ public:
   template <typename Container>
   Container sample(const int n, const Container &population)
   {
-#ifndef NO_EOSIO
-    eosio_assert(n > 0, "Failed: n > 0");
-#else
-    assert(n > 0);
-#endif
+    EOSIO_ASSERT(n > 0);
     Container res;
     const auto size = population.size();
     for (int i = 0; i < n; ++i) {
