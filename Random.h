@@ -1,4 +1,5 @@
 // EOS Blox - Pseudo-Random Number Generator
+// https://github.com/EOSBlox/random
 #ifndef EOS_BLOX_RANDOM_H
 #define EOS_BLOX_RANDOM_H
 
@@ -40,6 +41,8 @@ public:
 #ifndef NO_EOSIO
   /// Initialize generator with a seed derived from the Transactions as Proof-of-Stake (TAPOS)
   /// block number and prefix.
+  /** Notice that this is only to give _something_ as seed that changes depending on configuration.
+      It is still _recommended_ to seed the generator with proper randomness of some kind. */
   Random()
   {
     accumSeedRange({std::abs(tapos_block_num()), std::abs(tapos_block_prefix())});
