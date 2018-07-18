@@ -81,6 +81,8 @@ c++ -Ofast -std=c++11 -DNO_EOSIO tests.cc -o tests
 If a test fails it might look like the following:
 ```
 % ./tests
-Assertion failed: (gen.next() == value), function assertNextEq, file tests.cc, line 16.
+Assertion failed in file tests.cc, line 120, func testNext():
+  expected 849456367364724273
+  got      7364724273
 make: *** [test] Abort trap: 6
 ```

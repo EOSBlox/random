@@ -6,5 +6,5 @@ clean:
 	rm -fv tests
 
 test:
-	${CXX} -Ofast -std=c++11 -DNO_EOSIO tests.cc -o tests
+	${CXX} -std=c++11 -Wall -Ofast -DNO_EOSIO tests.cc -o tests
 	./tests
