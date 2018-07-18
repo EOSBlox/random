@@ -35,6 +35,7 @@ namespace eosblox {
     * \p next()
     * \p nextDouble()
     * \p nextInRange()
+    * \p nextSample()
     * \p shuffle()
     * \p sample()
 
@@ -154,6 +155,18 @@ public:
     return static_cast<uint64_t>(static_cast<double>(max - min) * nextDouble()) + min;
   }
 
+  /// Next random sample from \p population.
+  template <typename Container>
+  auto nextSample(const Container &population)
+  {
+    const auto size = population.size();
+    EOSIO_ASSERT(size > 0);
+    if (size <= 0) {
+      return typename Container::value_type();
+    }
+    return population[nextInRange(0, size)];
+  }
+
   /// Shuffles every element of container \p data around once.
   template <typename Container>
   void shuffle(Container &data)
@@ -173,14 +186,13 @@ public:
     const auto size = population.size();
     EOSIO_ASSERT(size > 0);
 
-    if (n <= 0 || size == 0) {
+    if (n <= 0 || size <= 0) {
       return {};
     }
 
     Container res;
     for (int i = 0; i < n; ++i) {
-      const auto s = population[nextInRange(0, size)];
-      res.push_back(s);
+      res.push_back(nextSample(population));
     }
     return res;
   }

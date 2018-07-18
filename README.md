@@ -1,5 +1,5 @@
 # Random.h
-Pseudo-random number generator for EOS.IO via a single C++ header file.
+Pseudo-random number generator for EOS.IO via a single C++14 header file.
 
 Since `<random>` is not available in EOS.IO, and they don't have good randomization primitives, we propose a simple pseudo-random number generator based on [xoroshiro128+](http://xoshiro.di.unimi.it) for generation and [splitmix64](https://dl.acm.org/citation.cfm?doid=2714064.2660195) for seed expansion.
 
@@ -47,17 +47,19 @@ The following EOS.IO types are directly supported via `Random::accumSeed()`:
 They are defined in `<eosiolib/types.h>`.
 
 ### Generating values
-Once the generator has been seeded, there are three ways of generating random values:
+Once the generator has been seeded, there are four ways of generating random values:
 * `uint64_t Random::next()`
 * `double Random::nextDouble()`
 * `uint64_t Random::nextInRange(const uint64_t min, const uint64_t max)`
+* `T Random::nextSample(const Container &population)`
 
 Examples:
 ```cpp
 Random gen;
-gen.next();              // Value in [0, 18446744073709551615]
-gen.nextDouble();        // Value in [0.0, 1.0[
+gen.next(); // Value in [0, 18446744073709551615]
+gen.nextDouble(); // Value in [0.0, 1.0[
 gen.nextInRange(20, 50); // Value in [20, 50[
+gen.nextSample(std::string("wasd")); // Value in ['w', 'a', 's', 'd']
 ```
 
 ### Shuffling containers
@@ -84,7 +86,7 @@ const sample = gen.sample(10, pop);
 A simple test suite can be compiled and executed like this:
 ```
 % make test
-c++ -Ofast -std=c++11 -DNO_EOSIO tests.cc -o tests
+c++ -std=c++14 -Wall -Ofast -DNO_EOSIO tests.cc -o tests
 ./tests
 ```
 

@@ -52,6 +52,19 @@ static void assertEqContainer(const Container &lhs, const Container &rhs, const 
   }
 }
 
+template <typename T>
+static void assertEqSample(const T &lhs, const T &rhs, const char *file, const int line,
+                           const char *func)
+{
+  if (lhs != rhs) {
+    printf("Assertion failed in file %s, line %d, func %s():\n\texpected ", file, line, func);
+    std::cout << lhs;
+    printf("\n\tgot      ");
+    std::cout << rhs << std::endl;
+    abort();
+  }
+}
+
 #define ASSERT_SEED_EQ(gen, value)                                                                 \
   assertEqUint64(gen.seed(), value, __FILE__, __LINE__, __FUNCTION__);
 
@@ -63,6 +76,9 @@ static void assertEqContainer(const Container &lhs, const Container &rhs, const 
 
 #define ASSERT_NEXT_IN_RANGE_EQ(gen, min, max, value)                                              \
   assertEqUint64(gen.nextInRange(min, max), value, __FILE__, __LINE__, __FUNCTION__);
+
+#define ASSERT_NEXT_SAMPLE_EQ(gen, pop, value)                                                     \
+  assertEqSample(gen.nextSample(pop), value, __FILE__, __LINE__, __FUNCTION__);
 
 #define ASSERT_SHUFFLE_EQ(gen, data, value)                                                        \
   {                                                                                                \
@@ -155,6 +171,17 @@ void testNextInRange()
   ASSERT_NEXT_IN_RANGE_EQ(gen, 10, 20, 18);
 }
 
+void testNextSample()
+{
+  Random gen(13);
+  const std::string pop("abcdef");
+  ASSERT_NEXT_SAMPLE_EQ(gen, pop, 'b');
+  ASSERT_NEXT_SAMPLE_EQ(gen, pop, 'e');
+  ASSERT_NEXT_SAMPLE_EQ(gen, pop, 'c');
+  ASSERT_NEXT_SAMPLE_EQ(gen, pop, 'd');
+  ASSERT_NEXT_SAMPLE_EQ(gen, pop, 'a');
+}
+
 void testShuffle()
 {
   {
@@ -193,6 +220,7 @@ int main(int argc, char **argv)
   testNext();
   testNextDouble();
   testNextInRange();
+  testNextSample();
   testShuffle();
   testSample();
   return 0;
