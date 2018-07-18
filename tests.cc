@@ -7,23 +7,15 @@ using namespace eosblox;
 #include <string>
 #include <vector>
 
-#define ASSERT_EQ_UINT64(lhs, rhs, file, line, func)                                               \
-  {                                                                                                \
-    const auto lhs_ = static_cast<uint64_t>(lhs);                                                  \
-    const auto rhs_ = static_cast<uint64_t>(rhs);                                                  \
-    if (lhs_ != rhs_) {                                                                            \
-      printf(                                                                                      \
-        "Assertion failed in file %s, line %d, func %s():\n\texpected %llu\n\tgot      %llu\n",    \
-        file, line, func, lhs_, rhs_);                                                             \
-      abort();                                                                                     \
-    }                                                                                              \
+static void assertEqUint64(const uint64_t lhs, const uint64_t rhs, const char *file, const int line,
+                           const char *func)
+{
+  if (lhs != rhs) {
+    printf("Assertion failed in file %s, line %d, func %s():\n\texpected %llu\n\tgot      %llu\n",
+           file, line, func, lhs, rhs);
+    abort();
   }
-
-#define ASSERT_SEED_EQ(gen, value)                                                                 \
-  ASSERT_EQ_UINT64(gen.seed(), value, __FILE__, __LINE__, __FUNCTION__)
-
-#define ASSERT_NEXT_EQ(gen, value)                                                                 \
-  ASSERT_EQ_UINT64(gen.next(), value, __FILE__, __LINE__, __FUNCTION__)
+}
 
 static inline bool doubleEqual(const double a, const double b)
 {
@@ -31,44 +23,51 @@ static inline bool doubleEqual(const double a, const double b)
   return std::abs(a - b) <= ((std::abs(a) < std::abs(b) ? std::abs(b) : std::abs(a)) * epsilon);
 }
 
-#define ASSERT_EQ_DOUBLE(lhs, rhs, file, line, func)                                               \
-  {                                                                                                \
-    const auto lhs_ = static_cast<double>(lhs);                                                    \
-    const auto rhs_ = static_cast<double>(rhs);                                                    \
-    if (!doubleEqual(lhs_, rhs_)) {                                                                \
-      printf("Assertion failed in file %s, line %d, func %s():\n\texpected %g\n\tgot      %g\n",   \
-             file, line, func, lhs_, rhs_);                                                        \
-      abort();                                                                                     \
-    }                                                                                              \
+static void assertEqDouble(const double lhs, const double rhs, const char *file, const int line,
+                           const char *func)
+{
+  if (!doubleEqual(lhs, rhs)) {
+    printf("Assertion failed in file %s, line %d, func %s():\n\texpected %g\n\tgot      %g\n", file,
+           line, func, lhs, rhs);
+    abort();
   }
+}
+
+template <typename Container>
+static void assertEqContainer(const Container &lhs, const Container &rhs, const char *file,
+                              const int line, const char *func)
+{
+  if (lhs != rhs) {
+    printf("Assertion failed in file %s, line %d, func %s():\n\texpected: ", file, line, func);
+    for (const auto &elm : lhs) {
+      std::cout << elm << " ";
+    }
+    std::cout << std::endl;
+    printf("  got:      ");
+    for (const auto &elm : rhs) {
+      std::cout << elm << " ";
+    }
+    std::cout << std::endl;
+    abort();
+  }
+}
+
+#define ASSERT_SEED_EQ(gen, value)                                                                 \
+  assertEqUint64(gen.seed(), value, __FILE__, __LINE__, __FUNCTION__);
+
+#define ASSERT_NEXT_EQ(gen, value)                                                                 \
+  assertEqUint64(gen.next(), value, __FILE__, __LINE__, __FUNCTION__);
 
 #define ASSERT_NEXT_DOUBLE_EQ(gen, value)                                                          \
-  ASSERT_EQ_DOUBLE(gen.nextDouble(), value, __FILE__, __LINE__, __FUNCTION__)
+  assertEqDouble(gen.nextDouble(), value, __FILE__, __LINE__, __FUNCTION__)
 
 #define ASSERT_NEXT_IN_RANGE_EQ(gen, min, max, value)                                              \
-  ASSERT_EQ_UINT64(gen.nextInRange(min, max), value, __FILE__, __LINE__, __FUNCTION__)
-
-#define ASSERT_EQ_CONTAINER(lhs, rhs, file, line, func)                                            \
-  {                                                                                                \
-    if (lhs != rhs) {                                                                              \
-      printf("Assertion failed in file %s, line %d, func %s():\n\texpected: ", file, line, func);  \
-      for (const auto &elm : lhs) {                                                                \
-        std::cout << elm << " ";                                                                   \
-      }                                                                                            \
-      std::cout << std::endl;                                                                      \
-      printf("  got:      ");                                                                      \
-      for (const auto &elm : rhs) {                                                                \
-        std::cout << elm << " ";                                                                   \
-      }                                                                                            \
-      std::cout << std::endl;                                                                      \
-      abort();                                                                                     \
-    }                                                                                              \
-  }
+  assertEqUint64(gen.nextInRange(min, max), value, __FILE__, __LINE__, __FUNCTION__);
 
 #define ASSERT_SHUFFLE_EQ(gen, data, value)                                                        \
   {                                                                                                \
     gen.shuffle(data);                                                                             \
-    ASSERT_EQ_CONTAINER(data, value, __FILE__, __LINE__, __FUNCTION__)                             \
+    assertEqContainer(data, value, __FILE__, __LINE__, __FUNCTION__);                              \
   }
 
 void testSeedAccumulation()
