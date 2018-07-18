@@ -148,6 +148,9 @@ public:
   uint64_t nextInRange(const uint64_t min, const uint64_t max)
   {
     EOSIO_ASSERT(min < max);
+    if (min >= max) {
+      return min;
+    }
     return static_cast<uint64_t>(static_cast<double>(max - min) * nextDouble()) + min;
   }
 
@@ -166,8 +169,15 @@ public:
   Container sample(const int n, const Container &population)
   {
     EOSIO_ASSERT(n > 0);
-    Container res;
+
     const auto size = population.size();
+    EOSIO_ASSERT(size > 0);
+
+    if (n <= 0 || size == 0) {
+      return {};
+    }
+
+    Container res;
     for (int i = 0; i < n; ++i) {
       const auto s = population[nextInRange(0, size)];
       res.push_back(s);
