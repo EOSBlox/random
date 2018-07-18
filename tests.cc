@@ -70,6 +70,12 @@ static void assertEqContainer(const Container &lhs, const Container &rhs, const 
     assertEqContainer(data, value, __FILE__, __LINE__, __FUNCTION__);                              \
   }
 
+#define ASSERT_SAMPLE_EQ(gen, n, pop, value)                                                       \
+  {                                                                                                \
+    const auto sample = gen.sample(n, pop);                                                        \
+    assertEqContainer(sample, value, __FILE__, __LINE__, __FUNCTION__);                            \
+  }
+
 void testSeedAccumulation()
 {
   Random gen(1);
@@ -172,6 +178,15 @@ void testShuffle()
   }
 }
 
+void testSample()
+{
+  Random gen(999);
+  const std::string pop("abcdef");
+  ASSERT_SAMPLE_EQ(gen, 10, pop, std::string("ccfdbfceef"));
+  ASSERT_SAMPLE_EQ(gen, 3, pop, std::string("fdd"));
+  ASSERT_SAMPLE_EQ(gen, 42, pop, std::string("abacdbfffadecdaaefbfeadcebaeefcdedefceeada"));
+}
+
 int main(int argc, char **argv)
 {
   testSeedAccumulation();
@@ -179,5 +194,6 @@ int main(int argc, char **argv)
   testNextDouble();
   testNextInRange();
   testShuffle();
+  testSample();
   return 0;
 }

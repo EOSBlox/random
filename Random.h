@@ -32,6 +32,7 @@ namespace eosblox {
     * \p nextDouble()
     * \p nextInRange()
     * \p shuffle()
+    * \p sample()
 
     [0]: https://dl.acm.org/citation.cfm?doid=2714064.2660195
     [1]: http://xoshiro.di.unimi.it
@@ -158,6 +159,24 @@ public:
     for (auto it = data.begin(); it != data.end(); ++it) {
       std::swap(*it, *(data.begin() + (next() % size)));
     }
+  }
+
+  /// Sample \p n values from \p population.
+  template <typename Container>
+  Container sample(const int n, const Container &population)
+  {
+#ifndef NO_EOSIO
+    eosio_assert(n > 0, "Failed: n > 0");
+#else
+    assert(n > 0);
+#endif
+    Container res;
+    const auto size = population.size();
+    for (int i = 0; i < n; ++i) {
+      const auto s = population[nextInRange(0, size)];
+      res.push_back(s);
+    }
+    return res;
   }
 
 private:

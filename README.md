@@ -7,6 +7,7 @@ Since `<random>` is not available in EOS.IO, and they don't have good randomizat
   * [Seeding the generator](#seeding-the-generator)
   * [Generating values](#generating-values)
   * [Shuffling containers](#shuffling-containers)
+  * [Sampling from a population](#sampling-from-a-population)
 * [Testing](#testing)
 
 ## Usage
@@ -69,6 +70,15 @@ gen.shuffle(str);
 ```
 
 Every element of the container is shuffled exactly once.
+
+### Sampling from a population
+General containers can be used for sampling a number of values from:
+```cpp
+Random gen;
+const std::string pop("abcdef");
+const sample = gen.sample(10, pop);
+// sample contains 10 randomly selected values from pop at this point.
+```
 
 ## Testing
 A simple test suite can be compiled and executed like this:
