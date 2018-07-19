@@ -85,9 +85,7 @@ const sample = gen.sample(10, pop);
 ## Testing
 A simple test suite can be compiled and executed like this:
 ```
-% make test
-c++ -std=c++14 -Wall -Ofast -DNO_EOSIO tests.cc -o tests
-./tests
+% make tests && ./tests
 ```
 
 If a test fails it might look like the following:

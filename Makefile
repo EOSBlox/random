@@ -1,10 +1,13 @@
 CXX=c++
+FLAGS=-std=c++14 -Wall -Ofast -DNO_EOSIO
 
-all: test
+all: tests speed
 
 clean:
-	rm -fv tests
+	rm -f tests speed
 
-test:
-	${CXX} -std=c++14 -Wall -Ofast -DNO_EOSIO tests.cc -o tests
-	./tests
+tests: tests.cc Random.h
+	${CXX} ${FLAGS} tests.cc -o tests
+
+speed: speed.cc Random.h
+	${CXX} ${FLAGS} speed.cc -o speed
